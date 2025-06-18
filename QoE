@@ -1,0 +1,48 @@
+import json
+import math
+
+# Path to JSON result file
+json_file = "result.json"
+
+# Load JSON data
+with open(json_file) as f:
+    data = json.load(f)
+
+# Check if TCP or UDP based on keys
+if "sum_received" in data["end"]:
+    # TCP Mode
+    bps = data["end"]["sum_received"]["bits_per_second"]
+    throughput_mbps = bps / 1e6
+    retransmits = data["end"]["streams"][0]["sender"].get("retransmits", 0)
+    rtt_us = data["end"]["streams"][0]["sender"].get("rtt", 0)
+    rtt_ms = rtt_us / 1000
+
+    # Research-aligned QoE formula for TCP
+    A, B, C = 20, 1.5, 0.1
+    qoe_score = A * math.log10(throughput_mbps + 1) - B * retransmits - C * rtt_ms
+
+    print("=== TCP QoE Metrics ===")
+    print(f"Throughput     : {throughput_mbps:.2f} Mbps")
+    print(f"RTT            : {rtt_ms:.2f} ms")
+    print(f"Retransmissions: {retransmits}")
+    print(f"QoE Score      : {qoe_score:.2f} (higher is better)")
+
+elif "sum" in data["end"]:
+    # UDP Mode
+    bps = data["end"]["sum"]["bits_per_second"]
+    throughput_mbps = bps / 1e6
+    jitter_ms = data["end"]["sum"].get("jitter_ms", 0)
+    loss_pct = data["end"]["sum"].get("lost_percent", 0)
+
+    # Research-style QoE formula for UDP
+    a, b, c = 15, 1.2, 2.0
+    qoe_score = a * math.log10(throughput_mbps + 1) - b * jitter_ms - c * loss_pct
+
+    print("=== UDP QoE Metrics ===")
+    print(f"Throughput : {throughput_mbps:.2f} Mbps")
+    print(f"Jitter     : {jitter_ms:.2f} ms")
+    print(f"Loss       : {loss_pct:.2f} %")
+    print(f"QoE Score  : {qoe_score:.2f} (higher is better)")
+
+else:
+    print("Unsupported or unrecognized iperf3 JSON format.")
