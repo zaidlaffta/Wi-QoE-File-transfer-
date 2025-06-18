@@ -1,0 +1,30 @@
+Overview
+QoE for file transfers is primarily influenced by throughput, latency (RTT), and packet loss. This project shows how to collect these metrics using iperf3 and derive a simple QoE score to evaluate the user-perceived quality.
+
+Requirements
+Linux/macOS or WSL (Windows Subsystem for Linux)
+
+Python 3 (for parsing JSON)
+
+iPerf3 (both client and server)
+
+Internet or LAN test setup
+
+# Install iperf3
+sudo apt install iperf3        # Ubuntu/Debian
+brew install iperf3            # macOS
+
+# Install Python JSON parser if needed
+pip install pandas
+
+For the Server side
+iperf3 -s -p 5202
+
+For the Client side
+iperf3 -c 10.111.101.75 -u -b 100M -t 10
+or you can use the following command to save everything in JS file:
+iperf3 -c 10.111.101.75 -u -b 100M -t 10 -J > result.json
+
+QoE formula
+QoE_UDP = a * log10(throughput + 1) - b * jitter - c * loss
+
