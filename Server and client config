@@ -1,0 +1,32 @@
+For the server, it
+
+The server is a Dell PowerEdge R740, a high-performance, enterprise-grade rack server designed for virtualization,  and large-scale workloads. 
+VMware ESXi with an instant of Ubuntu Server 24.04, providing a secure, stable, and up-to-date Linux environment. We host the Iperf3 server on it.
+We used the command 
+iperf3 -s
+---------------------------------------------------------
+
+For teh client side, I used Macbook pro and run the following command:
+
+while true; do
+  iperf3 -c 192.168.128.50 -u -b 100M -t 10 -J >> result_filetransfer.json
+  sleep 10
+done
+
+Explanation:
+while true; do ... done: Infinite loop — repeats the enclosed commands forever until interrupted (Ctrl+C).
+
+iperf3 -c 192.168.128.50: Runs iperf3 in client mode targeting IP 192.168.128.50.
+
+-u: Uses UDP instead of TCP.
+
+-b 100M: Sends traffic at 100 Mbps.
+
+-t 10: Test duration is 10 seconds.
+
+-J: Output in JSON format.
+
+>> result_filetransfer.json: Appends the result to the file result_filetransfer.json.
+
+sleep 10: Waits 10 seconds before starting the next iteration.
+
